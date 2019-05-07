@@ -1,0 +1,6 @@
+use_frameworks!
+
+target 'MoyaDemo' do
+  pod 'Moya', '~> 13.0'
+
+end
