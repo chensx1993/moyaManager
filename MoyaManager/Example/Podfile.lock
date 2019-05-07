@@ -1,0 +1,27 @@
+PODS:
+  - MoyaManager (0.1.0)
+  - Nimble (7.0.3)
+  - Quick (1.2.0)
+
+DEPENDENCIES:
+  - MoyaManager (from `../`)
+  - Nimble (~> 7.0.2)
+  - Quick (~> 1.2.0)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Nimble
+    - Quick
+
+EXTERNAL SOURCES:
+  MoyaManager:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MoyaManager: 70f36bea29c5b3510abce0dd3e098839939b70cc
+  Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
+  Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
+
+PODFILE CHECKSUM: a7473af0e14be1ff0859e89b8969525513745b28
+
+COCOAPODS: 1.5.3
