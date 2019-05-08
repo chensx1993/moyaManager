@@ -7,14 +7,37 @@
 //
 
 import UIKit
+import Moya
 
 class ViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        userLogin("chensx1993", password: "")
     }
+    
+    
 
+    func userLogin(_ username: String, password: String) {
+        
+        userModuleProvider.request(.login(username: username, password: password)) { (result) in
+            do {
+                let response = try result.get()
+                
+            } catch {
+                self.showAlert("error", message: "user login error")
+            }
+        }
+    }
+    
 
+    
+    fileprivate func showAlert(_ title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        present(alertController, animated: true, completion: nil)
+    }
 }
 
