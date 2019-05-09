@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B43023A2283CC2900BD0E0D /* NewActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */; };
+		2B43023D22840D9000BD0E0D /* MyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43023C22840D9000BD0E0D /* MyResponse.swift */; };
 		6D6EC43524FE469ED4D1508E /* Pods_MoyaDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */; };
 		CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */; };
 		CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F62281C8BC003E1D8D /* ViewController.swift */; };
@@ -40,6 +42,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewActivityPlugin.swift; sourceTree = "<group>"; };
+		2B43023C22840D9000BD0E0D /* MyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyResponse.swift; sourceTree = "<group>"; };
 		A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoyaDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F12281C8BC003E1D8D /* MoyaDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoyaDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -89,6 +93,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2B4302382283CBEA00BD0E0D /* Plugin */ = {
+			isa = PBXGroup;
+			children = (
+				2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */,
+			);
+			path = Plugin;
+			sourceTree = "<group>";
+		};
+		2B43023B22840D7B00BD0E0D /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				2B43023C22840D9000BD0E0D /* MyResponse.swift */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
+		2B43023E22840E1600BD0E0D /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				CD7F582B2282EDD1003E1D8D /* Network.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		656DAA1BE812C831A17C0815 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +159,9 @@
 		CD7F57F32281C8BC003E1D8D /* MoyaDemo */ = {
 			isa = PBXGroup;
 			children = (
+				2B43023E22840E1600BD0E0D /* Manager */,
+				2B43023B22840D7B00BD0E0D /* Response */,
+				2B4302382283CBEA00BD0E0D /* Plugin */,
 				CD7F58262282BC4B003E1D8D /* Server */,
 				CD7F582522828739003E1D8D /* Extension */,
 				CD7F5824228283CC003E1D8D /* API */,
@@ -165,10 +196,9 @@
 		CD7F5824228283CC003E1D8D /* API */ = {
 			isa = PBXGroup;
 			children = (
-				CD7F582D2283157E003E1D8D /* CommonAPI.swift */,
 				CD7F58292282DBE8003E1D8D /* MyServerType.swift */,
+				CD7F582D2283157E003E1D8D /* CommonAPI.swift */,
 				CD7F5822228283C7003E1D8D /* UserModuleAPI.swift */,
-				CD7F582B2282EDD1003E1D8D /* Network.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -364,6 +394,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B43023A2283CC2900BD0E0D /* NewActivityPlugin.swift in Sources */,
 				CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */,
 				CD7F5823228283C7003E1D8D /* UserModuleAPI.swift in Sources */,
 				CD7F582E2283157E003E1D8D /* CommonAPI.swift in Sources */,
@@ -371,6 +402,7 @@
 				CD7F58282282BC68003E1D8D /* Server.swift in Sources */,
 				CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */,
 				CD7F582A2282DBE8003E1D8D /* MyServerType.swift in Sources */,
+				2B43023D22840D9000BD0E0D /* MyResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

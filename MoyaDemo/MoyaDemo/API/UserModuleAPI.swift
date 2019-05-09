@@ -42,7 +42,12 @@ extension UserModule: TargetType {
     }
     
     public var method: Moya.Method {
-        return .get
+        switch self {
+        case .logout:
+            return .post
+        default:
+            return .get
+        }
     }
     
     public var sampleData: Data {

@@ -9,12 +9,25 @@
 import Foundation
 
 enum CommonAPI {
-    case url(url: String)
-    case url(url: String, parameters: String)
-    case url(url: String, parameters: [String : Any], header: [String : String])
+    case url(String)
+    case url(String, parameters: String)
+    case url(String, parameters: [String : Any], header: [String : String])
 }
 
 extension CommonAPI: MyServerType {
+    
+    var base: String {
+        switch self {
+        case .url(let url, _ , _):
+            if url.contains("http") {
+                return "";
+            }
+            return WebService.sharedInstance.rootUrl
+        default:
+            return WebService.sharedInstance.rootUrl
+        }
+    }
+    
     var path: String {
         switch self {
         case .url(let url, _ , _):

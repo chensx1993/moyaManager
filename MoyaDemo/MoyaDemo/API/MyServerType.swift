@@ -46,6 +46,10 @@ extension MyServerType {
     public var sampleData: Data {
         return "test".data(using: String.Encoding.utf8)!
     }
+    
+    var validationType: ValidationType {
+        return .none
+    }
 }
 
 

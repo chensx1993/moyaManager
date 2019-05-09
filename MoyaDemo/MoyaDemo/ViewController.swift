@@ -15,9 +15,23 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         userLogin("chensx1993", password: "")
+        commonReques()
     }
     
-    
+    func commonReques() {
+        networking.request(.url("https://api.github.com/zen"), success: { (response) in
+            do {
+                let json = try response.mapString()
+                print("\(json)");
+                
+            } catch(let error) {
+                self.showAlert("error", message: "mapping string error: \(error)");
+            }
+            
+        }) { (error) in
+            
+        }
+    }
 
     func userLogin(_ username: String, password: String) {
         
@@ -30,8 +44,6 @@ class ViewController: UIViewController {
             }
         }
     }
-    
-
     
     fileprivate func showAlert(_ title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
