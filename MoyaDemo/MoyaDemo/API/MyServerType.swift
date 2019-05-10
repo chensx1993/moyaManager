@@ -15,19 +15,17 @@ public protocol MyServerType: TargetType {
 }
 
 extension MyServerType {
-    var base: String { return WebService.sharedInstance.rootUrl }
+    public var base: String { return WebService.sharedInstance.rootUrl }
     
-    var baseURL: URL { return URL(string: base)! }
+    public var baseURL: URL { return URL(string: base)! }
     
-    var headers: [String : String]? { return WebService.sharedInstance.headers() }
+    public var headers: [String : String]? { return WebService.sharedInstance.headers }
     
-    var parameters: [String: Any]? { return WebService.sharedInstance.parameters() }
+    public var parameters: [String: Any]? { return WebService.sharedInstance.parameters }
     
-    public var method: Moya.Method {
-        return .post
-    }
+    public var isShowLoading: Bool { return false }
     
-    var task: Task {
+    public var task: Task {
         let encoding: ParameterEncoding
         switch self.method {
         case .post:
@@ -41,14 +39,17 @@ extension MyServerType {
         return .requestPlain
     }
     
-    var isShowLoading: Bool { return false }
     
-    public var sampleData: Data {
-        return "test".data(using: String.Encoding.utf8)!
+    public var method: Moya.Method {
+        return .get
     }
     
-    var validationType: ValidationType {
-        return .none
+    public var sampleData: Data {
+        return "response: test data".data(using: String.Encoding.utf8)!
+    }
+    
+    public var validationType: ValidationType {
+        return .successCodes
     }
 }
 

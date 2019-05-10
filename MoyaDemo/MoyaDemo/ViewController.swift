@@ -14,15 +14,28 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        userLogin("chensx1993", password: "")
-        commonReques()
+//        userLogin("chensx1993", password: "")
+        testReques()
+//        commonReques()
+    }
+    
+    func testReques() {
+        networking.requestJson(GitHub.userProfile("chensx1993"), success: { (json) in
+            print("\n\n=========json:\n\(json)\n============")
+        }) { (error) in
+            
+        }
     }
     
     func commonReques() {
-        networking.request(.url("https://api.github.com/zen"), success: { (response) in
+        let username = "chensx1993".urlEscaped
+        let url = "https://api.github.com/users/\(username)"
+        let parameters = ["sort": "pushed"]
+        
+        networking.requestNormal(.url2(url, parameters: parameters), success: { (response) in
             do {
-                let json = try response.mapString()
-                print("\(json)");
+                let json = try response.mapJSON()
+                print("\(url): \(json)");
                 
             } catch(let error) {
                 self.showAlert("error", message: "mapping string error: \(error)");

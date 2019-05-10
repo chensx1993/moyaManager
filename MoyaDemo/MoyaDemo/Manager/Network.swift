@@ -15,13 +15,6 @@ public typealias Failure = (_ error: MoyaError) -> Void
 protocol NetworkingType {
     associatedtype T: TargetType
     var provider: MoyaProvider<T> { get }
-    
-    func request(_ target: T,
-    callbackQueue: DispatchQueue?,
-    progress: ProgressBlock?,
-    success: @escaping Success,
-    failure: @escaping Failure) -> Cancellable;
-    
 }
 
 struct Networking: NetworkingType {
@@ -34,12 +27,53 @@ let networking = Networking.init()
 extension Networking {
     
     @discardableResult
-    func request(_ target: CommonAPI,
+    func requestJson<T: MyServerType>(_ target: T,
+                                  callbackQueue: DispatchQueue? = DispatchQueue.main,
+                                  progress: ProgressBlock? = .none,
+                                  success: @escaping (_ response: Any) -> Void,
+                                  failure: @escaping Failure) -> Cancellable {
+        let provider: MoyaProvider<T> = newProvider(Networking.plugins)
+        return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
+            switch result {
+            case .success(let response):
+                do {
+                    let json = try response.mapJSON()
+                    success(json)
+                }catch (let error) {
+                    failure(error as! MoyaError)
+                }
+            case .failure(let error):
+                failure(error);
+                break
+            }
+        }
+    }
+    
+    
+    @discardableResult
+    func request<T: MyServerType>(_ target: T,
                  callbackQueue: DispatchQueue? = DispatchQueue.main,
                  progress: ProgressBlock? = .none,
                  success: @escaping Success,
                  failure: @escaping Failure) -> Cancellable {
-        
+        let provider: MoyaProvider<T> = newProvider(Networking.plugins)
+        return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
+            switch result {
+            case .success(let response):
+                success(response);
+            case .failure(let error):
+                failure(error);
+                break
+            }
+        }
+    }
+    
+    @discardableResult
+    func requestNormal(_ target: CommonAPI,
+                 callbackQueue: DispatchQueue? = DispatchQueue.main,
+                 progress: ProgressBlock? = .none,
+                 success: @escaping Success,
+                 failure: @escaping Failure) -> Cancellable {
         return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
             case .success(let response):
@@ -66,7 +100,7 @@ extension Networking {
         }
     }
     
-    // (Endpoint, NSURLRequest -> Void) -> Void
+    
     static func endpointResolver() -> MoyaProvider<T>.RequestClosure {
         return { (endpoint, closure) in
             do {
@@ -80,7 +114,7 @@ extension Networking {
     }
     
     static func APIKeysBasedStubBehaviour<T>(_: T) -> Moya.StubBehavior {
-        return .immediate;// APIKeys.sharedKeys.stubResponses ? .immediate : .never
+        return .never;// APIKeys.sharedKeys.stubResponses ? .immediate : .never
     }
     
     static var plugins: [PluginType] {
@@ -99,8 +133,9 @@ extension Networking {
                 }
             }
         }
+        
         return [
-            activityPlugin
+            activityPlugin, myLoggorPlugin
         ]
     }
     
@@ -111,5 +146,6 @@ private func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T
     return MoyaProvider(endpointClosure: Networking.endpointsClosure(),
                           requestClosure: Networking.endpointResolver(),
                           stubClosure: Networking.APIKeysBasedStubBehaviour,
+                          manager:WebService.sharedInstance.manager,
                           plugins: plugins)
 }

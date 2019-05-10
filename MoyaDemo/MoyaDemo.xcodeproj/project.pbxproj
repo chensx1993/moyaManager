@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		2B43023A2283CC2900BD0E0D /* NewActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */; };
 		2B43023D22840D9000BD0E0D /* MyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B43023C22840D9000BD0E0D /* MyResponse.swift */; };
+		2B54082E22851E5E009486F0 /* NewLoggorPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54082D22851E5E009486F0 /* NewLoggorPlugin.swift */; };
+		2B5408302285211A009486F0 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54082F2285211A009486F0 /* String+Extension.swift */; };
+		2B54083422855879009486F0 /* UserModuleAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54083322855879009486F0 /* UserModuleAPI.swift */; };
+		2B540838228558DB009486F0 /* GitHubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B540837228558DB009486F0 /* GitHubAPI.swift */; };
 		6D6EC43524FE469ED4D1508E /* Pods_MoyaDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */; };
 		CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */; };
 		CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F62281C8BC003E1D8D /* ViewController.swift */; };
@@ -17,7 +21,6 @@
 		CD7F57FF2281C8BD003E1D8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CD7F57FD2281C8BD003E1D8D /* LaunchScreen.storyboard */; };
 		CD7F580A2281C8BD003E1D8D /* MoyaDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F58092281C8BD003E1D8D /* MoyaDemoTests.swift */; };
 		CD7F58152281C8BD003E1D8D /* MoyaDemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F58142281C8BD003E1D8D /* MoyaDemoUITests.swift */; };
-		CD7F5823228283C7003E1D8D /* UserModuleAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F5822228283C7003E1D8D /* UserModuleAPI.swift */; };
 		CD7F58282282BC68003E1D8D /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F58272282BC68003E1D8D /* Server.swift */; };
 		CD7F582A2282DBE8003E1D8D /* MyServerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F58292282DBE8003E1D8D /* MyServerType.swift */; };
 		CD7F582C2282EDD1003E1D8D /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F582B2282EDD1003E1D8D /* Network.swift */; };
@@ -44,6 +47,10 @@
 /* Begin PBXFileReference section */
 		2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewActivityPlugin.swift; sourceTree = "<group>"; };
 		2B43023C22840D9000BD0E0D /* MyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyResponse.swift; sourceTree = "<group>"; };
+		2B54082D22851E5E009486F0 /* NewLoggorPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewLoggorPlugin.swift; sourceTree = "<group>"; };
+		2B54082F2285211A009486F0 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String+Extension.swift"; path = "MoyaDemo/Plugin/String+Extension.swift"; sourceTree = SOURCE_ROOT; };
+		2B54083322855879009486F0 /* UserModuleAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserModuleAPI.swift; sourceTree = "<group>"; };
+		2B540837228558DB009486F0 /* GitHubAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAPI.swift; sourceTree = "<group>"; };
 		A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoyaDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F12281C8BC003E1D8D /* MoyaDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoyaDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -58,7 +65,6 @@
 		CD7F58102281C8BD003E1D8D /* MoyaDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoyaDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F58142281C8BD003E1D8D /* MoyaDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaDemoUITests.swift; sourceTree = "<group>"; };
 		CD7F58162281C8BD003E1D8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CD7F5822228283C7003E1D8D /* UserModuleAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModuleAPI.swift; sourceTree = "<group>"; };
 		CD7F58272282BC68003E1D8D /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
 		CD7F58292282DBE8003E1D8D /* MyServerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyServerType.swift; sourceTree = "<group>"; };
 		CD7F582B2282EDD1003E1D8D /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
@@ -97,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				2B4302392283CC2900BD0E0D /* NewActivityPlugin.swift */,
+				2B54082D22851E5E009486F0 /* NewLoggorPlugin.swift */,
 			);
 			path = Plugin;
 			sourceTree = "<group>";
@@ -197,8 +204,9 @@
 			isa = PBXGroup;
 			children = (
 				CD7F58292282DBE8003E1D8D /* MyServerType.swift */,
+				2B540837228558DB009486F0 /* GitHubAPI.swift */,
 				CD7F582D2283157E003E1D8D /* CommonAPI.swift */,
-				CD7F5822228283C7003E1D8D /* UserModuleAPI.swift */,
+				2B54083322855879009486F0 /* UserModuleAPI.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -206,6 +214,7 @@
 		CD7F582522828739003E1D8D /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				2B54082F2285211A009486F0 /* String+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -394,11 +403,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B54083422855879009486F0 /* UserModuleAPI.swift in Sources */,
 				2B43023A2283CC2900BD0E0D /* NewActivityPlugin.swift in Sources */,
+				2B5408302285211A009486F0 /* String+Extension.swift in Sources */,
+				2B54082E22851E5E009486F0 /* NewLoggorPlugin.swift in Sources */,
 				CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */,
-				CD7F5823228283C7003E1D8D /* UserModuleAPI.swift in Sources */,
 				CD7F582E2283157E003E1D8D /* CommonAPI.swift in Sources */,
 				CD7F582C2282EDD1003E1D8D /* Network.swift in Sources */,
+				2B540838228558DB009486F0 /* GitHubAPI.swift in Sources */,
 				CD7F58282282BC68003E1D8D /* Server.swift in Sources */,
 				CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */,
 				CD7F582A2282DBE8003E1D8D /* MyServerType.swift in Sources */,

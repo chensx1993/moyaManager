@@ -10,46 +10,54 @@ import Foundation
 
 enum CommonAPI {
     case url(String)
-    case url(String, parameters: String)
-    case url(String, parameters: [String : Any], header: [String : String])
+    case url2(String, parameters: [String: Any]?)
+    case url3(String, parameters: [String: Any]?, header: [String : String])
 }
 
 extension CommonAPI: MyServerType {
-    
-    var base: String {
-        switch self {
-        case .url(let url, _ , _):
-            if url.contains("http") {
-                return "";
-            }
-            return WebService.sharedInstance.rootUrl
-        default:
-            return WebService.sharedInstance.rootUrl
-        }
-    }
-    
     var path: String {
         switch self {
-        case .url(let url, _ , _):
-            return url;
-        default:
-            return "";
+        case .url(let url):
+            return myPath(url)
+        case .url2(let url, _):
+            return myPath(url)
+        case .url3(let url, _ , _):
+            return myPath(url)
+        }
+    }
+
+    var base: String {
+        switch self {
+        case .url(let url):
+            return myBaseUrl(url)
+        case .url2(let url, _):
+            return myBaseUrl(url)
+        case .url3(let url, _ , _):
+            return myBaseUrl(url)
         }
     }
     
      var parameters: [String: Any]? {
-        var requeseParameters = WebService.sharedInstance.parameters()
+        var requeseParameters = WebService.sharedInstance.parameters
+        
+        var newParameters: [String: Any]?
         
         switch self {
-        case .url(_, let parameters , _):
-            parameters.forEach { (arg) in
-                let (key, value) = arg
-                requeseParameters?[key] = value
-            }
-            return requeseParameters;
+        case .url2(_, let parameters):
+            newParameters = parameters
+        case .url3(_, let parameters, _):
+            newParameters = parameters
         default:
             return requeseParameters
         }
+        
+        if let temp = newParameters {
+            temp.forEach { (arg) in
+                let (key, value) = arg
+                requeseParameters?[key] = value
+            }
+        }
+        return requeseParameters;
     }
         
 }
