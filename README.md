@@ -209,10 +209,88 @@ extension GitHub: TargetType {
 ```
 TargetType的设计理念是，先创建一个enum，如`Github`，那代表是你的服务器，case1，case2，case3代表各个API，这样就能统一处理，还可以针对个别API做不同的处理。
 
-创建了
+设置好了配置，就可以简单创建一个Provider了:
 
-### 3. response
+``` Swift
+let provider = MoyaProvider<GitHub>()
+
+```
+
+
+### 3. 网络请求方法
+
+创建好了Provider，我们就可以直接调用网络请求了:
+
+``` Swift
+ gitHubProvider.request(.zen) { result in
+            var message = "Couldn't access API"
+            if case let .success(response) = result {
+                let jsonString = try? response.mapString()
+                message = jsonString ?? message
+            }
+
+            self.showAlert("Zen", message: message)
+        }
+```
+`request()` 方法返回一个`Cancellable`, 它有一个你可以取消request的公共的方法。
+
+### 4. Result
+
+网络请求有个回调，回调一个`Result`类型的数据:
+
+``` Swift
+Result<Moya.Response, MoyaError>
+```
+再看看具体定义：
+
+``` Swift
+public enum Result<Value, Error: Swift.Error>: ResultProtocol, CustomStringConvertible, CustomDebugStringConvertible {
+
+    case success(Value)
+    
+    case failure(Error)
+    
+    //其他略过
+}
+```
+这是一个枚举，通过枚举获取对应`value`，`error`；
+
+这也是一个泛型的经典用法，其中 `Value` 对应 `Moya.Response`， `Error` 对应 `MoyaError`。
+
+``` Swift
+ gitHubProvider.request(.zen) { result in
+            switch self {
+				case let .success(response):
+				   let json = try response.mapJSON()
+					print("\(json)");
+					
+				case let .failure(error):
+					break;
+				}
+        }
+
+```
+
+`Moya.Response`是`public final class`, 里面有一些好用的方法:
+
+``` Swift
+// 转换为Image
+func mapImage() throws -> Image;
+
+// 转换为Json
+func mapJSON(failsOnEmptyData: Bool = true) throws -> Any;
+
+// 装换为String
+func mapString(atKeyPath keyPath: String? = nil) throws -> String;
+
+// 转换为对应的model
+func map<D: Decodable>(_ type: D.Type, atKeyPath keyPath: String? = nil, using decoder: JSONDecoder = JSONDecoder(), failsOnEmptyData: Bool = true) throws -> D;
+```
+
+有关`Moya.Response`，`MoyaError`大家可自行看看源码，有很多好用的属性及方法。
+
+
+
 
 ## Moya的高级用法
 
-## Moya result<value, error>

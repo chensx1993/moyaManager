@@ -35,14 +35,14 @@ extension Networking {
         let provider: MoyaProvider<T> = newProvider(Networking.plugins)
         return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
-            case .success(let response):
+            case let .success(response):
                 do {
                     let json = try response.mapJSON()
                     success(json)
                 }catch (let error) {
                     failure(error as! MoyaError)
                 }
-            case .failure(let error):
+            case let .failure(error):
                 failure(error);
                 break
             }
@@ -59,9 +59,9 @@ extension Networking {
         let provider: MoyaProvider<T> = newProvider(Networking.plugins)
         return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
-            case .success(let response):
+            case let .success(response):
                 success(response);
-            case .failure(let error):
+            case let .failure(error):
                 failure(error);
                 break
             }
