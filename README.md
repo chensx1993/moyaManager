@@ -6,7 +6,7 @@
 让我们用一张图来简单来对比一下直接用Alamofire和用moya的区别：
 
 
-![Moya Overview](images/diagram.png)
+![Moya Overview](Images/diagram.png)
 
 ## 有关Alamofire
 为了对Moya有更好的了解。让我们先复习一下Alamofire的用法。
@@ -290,7 +290,172 @@ func map<D: Decodable>(_ type: D.Type, atKeyPath keyPath: String? = nil, using d
 有关`Moya.Response`，`MoyaError`大家可自行看看源码，有很多好用的属性及方法。
 
 
-
-
 ## Moya的高级用法
+Moya实现了网络层的高度抽象，它是通过以下管道来实现这一点的：
+![Moya Overview](Images/moya_request.png)
 
+让我们回顾一下，`Provider`的构造方法:
+
+``` Swift
+/// Initializes a provider.
+    public init(endpointClosure: @escaping EndpointClosure = MoyaProvider.defaultEndpointMapping,
+                requestClosure: @escaping RequestClosure = MoyaProvider.defaultRequestMapping,
+                stubClosure: @escaping StubClosure = MoyaProvider.neverStub,
+                callbackQueue: DispatchQueue? = nil,
+                manager: Manager = MoyaProvider<Target>.defaultAlamofireManager(),
+                plugins: [PluginType] = [],
+                trackInflights: Bool = false) {
+
+        self.endpointClosure = endpointClosure
+        self.requestClosure = requestClosure
+        self.stubClosure = stubClosure
+        self.manager = manager
+        self.plugins = plugins
+        self.trackInflights = trackInflights
+        self.callbackQueue = callbackQueue
+    }
+    
+```
+
+Provider输入的参数包括：`EndpointClosure `,`RequestClosure `,`StubClosure `, `callbackQueue `,`plugins `, `trackInflights `。
+
+### Endpoints
+> `Provider` 将 `Targets` 映射成 `Endpoints `, 然后再将 `Endpoints ` 映射成真正的 `Request`。
+
+而`EndpointClosure = (Target) -> Endpoint`就是定义如何将 `Targets 映射为 `Endpoints `
+
+在这个闭包中，你可以改变`task`，`method`，`url`, `headers` 或者 `sampleResponse `。比如，我们可能希望将应用程序名称设置到HTTP头字段中，从而用于服务器端分析。
+
+``` Swift
+let endpointClosure = { (target: MyTarget) -> Endpoint in
+    let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+    return defaultEndpoint.adding(newHTTPHeaderFields: ["APP_NAME": "MY_AWESOME_APP"])
+}
+let provider = MoyaProvider<GitHub>(endpointClosure: endpointClosure)
+```
+
+### requestClosure
+前面`endpointClosure `会把`target`映射为`endpoint`, Moya会把`endpoint`转换为一个真正的`Request`。
+
+`RequestClosure = (Endpoint, @escaping RequestResultClosure) -> Void` 就是 `Endpoint` 转换为 `Request`的一个拦截，它还可以修改请求的结果( 通过调用`RequestResultClosure = (Result<URLRequest, MoyaError>)` )
+
+``` Swift
+let requestClosure = { (endpoint: Endpoint, done: MoyaProvider.RequestResultClosure) in
+    do {
+        var request = try endpoint.urlRequest()
+        // Modify the request however you like.
+        done(.success(request))
+    } catch {
+        done(.failure(MoyaError.underlying(error)))
+    }
+
+}
+let provider = MoyaProvider<GitHub>(requestClosure: requestClosure)
+```
+
+### stubClosure
+
+下一个选择是来提供一个`stubClosure`。这个闭包返回 `.never` (默认的), `.immediate` 或者可以把stub请求延迟指定时间的`.delayed(seconds)`三个中的一个。 例如, `.delayed(0.2)` 可以把每个stub 请求延迟0.2s. 这个在单元测试中来模拟网络请求是非常有用的。
+
+更棒的是如果您需要对请求进行区别性的stub，那么您可以使用自定义的闭包。
+
+``` Swift
+let provider = MoyaProvider<MyTarget>(stubClosure: { target: MyTarget -> Moya.StubBehavior in
+    switch target {
+        /* Return something different based on the target. */
+    }
+})
+```
+
+### manager
+`Provider`里面你可以自定义一个 `Alamofire.Manager`实例对象。
+
+``` Swift
+// 这是Moya默认的manager
+public final class func defaultAlamofireManager() -> Manager {
+    let configuration = URLSessionConfiguration.default
+    configuration.httpAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders
+
+    let manager = Alamofire.Manager(configuration: configuration)
+    manager.startRequestsImmediately = false //设定false，为了单元测试
+    return manager
+}
+```
+用法如下：
+
+``` Swift
+let userModuleProvider = MoyaProvider<UserModule>(manager:yourManager)
+```
+
+### plugins(插件)
+最后, 您可能也提供一个`plugins`数组给`provider`。 这些插件会在请求被发送前及响应收到后被执行。 `Moya`已经提供了一些插件: 一个是 网络活动(`NetworkActivityPlugin`),一个是记录所有的 网络活动 (`NetworkLoggerPlugin`), 还有一个是 HTTP Authentication。
+
+`plugins`里面的对象都遵循协议`PluginType`, 协议了规定了几种方法，阐述了什么时候会被调用。
+
+``` Swift
+public protocol PluginType {
+    /// modified Request 请求发送之前调用(主要用于修改request)
+    /// Called to modify a request before sending.
+    func prepare(_ request: URLRequest, target: TargetType) -> URLRequest
+
+    /// Request 请求发送之前调用
+    /// Called immediately before a request is sent over the network (or stubbed).
+    func willSend(_ request: RequestType, target: TargetType)
+
+    /// 接收到了response，completion handler 之前调用
+    /// Called after a response has been received, but before the MoyaProvider has invoked its completion handler.
+    func didReceive(_ result: Result<Moya.Response, MoyaError>, target: TargetType)
+
+    /// completion handler 之前调用(主要用于修改result)
+    /// Called to modify a result before completion.
+    func process(_ result: Result<Moya.Response, MoyaError>, target: TargetType) -> Result<Moya.Response, MoyaError>
+}
+```
+
+Moya已经有了一个`NetworkActivityPlugin `:
+
+``` Swift
+public final class NetworkActivityPlugin: PluginType {
+
+    public typealias NetworkActivityClosure = (_ change: NetworkActivityChangeType, _ target: TargetType) -> Void
+    let networkActivityClosure: NetworkActivityClosure
+
+    public init(networkActivityClosure: @escaping NetworkActivityClosure) {
+        self.networkActivityClosure = networkActivityClosure
+    }
+
+    public func willSend(_ request: RequestType, target: TargetType) {
+        networkActivityClosure(.began, target)
+    }
+
+    public func didReceive(_ result: Result<Moya.Response, MoyaError>, target: TargetType) {
+        networkActivityClosure(.ended, target)
+    }
+}
+```
+
+它的用法也好简单：
+
+``` Swift
+static var plugins: [PluginType] {
+        let activityPlugin = NewNetworkActivityPlugin { (state, targetType) in
+            switch state {
+            case .began:
+                if targetType.isShowLoading { //这是我扩展的协议
+                    // 显示loading
+                }
+            case .ended:
+                if targetType.isShowLoading { //这是我扩展的协议
+                    // 关闭loading
+                }
+            }
+        }
+        
+        return [
+            activityPlugin, myLoggorPlugin
+        ]
+    }
+    
+ let userModuleProvider = MoyaProvider<UserModule>(plugins: plugins)
+    
+```

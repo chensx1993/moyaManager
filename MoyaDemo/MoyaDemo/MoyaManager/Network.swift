@@ -76,9 +76,9 @@ extension Networking {
                  failure: @escaping Failure) -> Cancellable {
         return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
-            case .success(let response):
+            case let .success(response):
                 success(response);
-            case .failure(let error):
+            case let .failure(error):
                 failure(error);
                 break
             }
@@ -121,15 +121,12 @@ extension Networking {
         let activityPlugin = NewNetworkActivityPlugin { (state, targetType) in
             switch state {
             case .began:
-                DispatchQueue.main.async {
-                    if targetType.isShowLoading {
-                    }
+                if targetType.isShowLoading { //这是我扩展的协议
+                    // 显示loading
                 }
             case .ended:
-                DispatchQueue.main.async {
-                    if targetType.isShowLoading {
-                        
-                    }
+                if targetType.isShowLoading { //这是我扩展的协议
+                    // 关闭loading
                 }
             }
         }
