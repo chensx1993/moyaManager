@@ -17,6 +17,7 @@
 		2B54087322891252009486F0 /* MyServerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54086922891252009486F0 /* MyServerType.swift */; };
 		2B54087422891252009486F0 /* CommonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54086A22891252009486F0 /* CommonAPI.swift */; };
 		2B54087522891252009486F0 /* UserModuleAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54086B22891252009486F0 /* UserModuleAPI.swift */; };
+		2B5408AF228AC5A4009486F0 /* CommonNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5408AE228AC5A4009486F0 /* CommonNetwork.swift */; };
 		6D6EC43524FE469ED4D1508E /* Pods_MoyaDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */; };
 		CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */; };
 		CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F57F62281C8BC003E1D8D /* ViewController.swift */; };
@@ -55,6 +56,7 @@
 		2B54086922891252009486F0 /* MyServerType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyServerType.swift; sourceTree = "<group>"; };
 		2B54086A22891252009486F0 /* CommonAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonAPI.swift; sourceTree = "<group>"; };
 		2B54086B22891252009486F0 /* UserModuleAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserModuleAPI.swift; sourceTree = "<group>"; };
+		2B5408AE228AC5A4009486F0 /* CommonNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonNetwork.swift; sourceTree = "<group>"; };
 		A6569695E0D94A80564D1C17 /* Pods_MoyaDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoyaDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F12281C8BC003E1D8D /* MoyaDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoyaDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD7F57F42281C8BC003E1D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				2B54086422891252009486F0 /* Network.swift */,
+				2B5408AE228AC5A4009486F0 /* CommonNetwork.swift */,
 				2B540877228912CF009486F0 /* Extension */,
 				2B54085E22891252009486F0 /* Response */,
 				2B54086022891252009486F0 /* Plugin */,
@@ -416,6 +419,7 @@
 				2B54087222891252009486F0 /* GitHubAPI.swift in Sources */,
 				2B54087322891252009486F0 /* MyServerType.swift in Sources */,
 				CD7F57F72281C8BC003E1D8D /* ViewController.swift in Sources */,
+				2B5408AF228AC5A4009486F0 /* CommonNetwork.swift in Sources */,
 				CD7F57F52281C8BC003E1D8D /* AppDelegate.swift in Sources */,
 				2B54086C22891252009486F0 /* MyResponse.swift in Sources */,
 				2B54086F22891252009486F0 /* String+Extension.swift in Sources */,

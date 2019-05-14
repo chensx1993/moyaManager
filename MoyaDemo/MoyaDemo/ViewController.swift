@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     }
     
     func testReques() {
-        networking.requestJson(GitHub.userProfile("chensx1993"), success: { (json) in
+        requestJson(GitHub.userProfile("chensx1993"), success: { (json) in
             print("\n\n=========json:\n\(json)\n============")
         }) { (error) in
             

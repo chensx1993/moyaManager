@@ -27,48 +27,6 @@ let networking = Networking.init()
 extension Networking {
     
     @discardableResult
-    func requestJson<T: MyServerType>(_ target: T,
-                                  callbackQueue: DispatchQueue? = DispatchQueue.main,
-                                  progress: ProgressBlock? = .none,
-                                  success: @escaping (_ response: Any) -> Void,
-                                  failure: @escaping Failure) -> Cancellable {
-        let provider: MoyaProvider<T> = newProvider(Networking.plugins)
-        return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
-            switch result {
-            case let .success(response):
-                do {
-                    let json = try response.mapJSON()
-                    success(json)
-                }catch (let error) {
-                    failure(error as! MoyaError)
-                }
-            case let .failure(error):
-                failure(error);
-                break
-            }
-        }
-    }
-    
-    
-    @discardableResult
-    func request<T: MyServerType>(_ target: T,
-                 callbackQueue: DispatchQueue? = DispatchQueue.main,
-                 progress: ProgressBlock? = .none,
-                 success: @escaping Success,
-                 failure: @escaping Failure) -> Cancellable {
-        let provider: MoyaProvider<T> = newProvider(Networking.plugins)
-        return provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
-            switch result {
-            case let .success(response):
-                success(response);
-            case let .failure(error):
-                failure(error);
-                break
-            }
-        }
-    }
-    
-    @discardableResult
     func requestNormal(_ target: CommonAPI,
                  callbackQueue: DispatchQueue? = DispatchQueue.main,
                  progress: ProgressBlock? = .none,
@@ -139,7 +97,7 @@ extension Networking {
     
 }
 
-private func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServerType {
+func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServerType {
     return MoyaProvider(endpointClosure: Networking.endpointsClosure(),
                           requestClosure: Networking.endpointResolver(),
                           stubClosure: Networking.APIKeysBasedStubBehaviour,
