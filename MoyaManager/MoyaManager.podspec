@@ -36,7 +36,10 @@ TODO: Add long description of the pod here.
   #   'MoyaManager' => ['MoyaManager/Assets/*.png']
   # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
+  s.public_header_files = 'Pod/Classes/**/*.swift'
   # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  
+  s.dependency 'Moya', '~> 13.0'
+  s.dependency 'Alamofire'
+  
 end

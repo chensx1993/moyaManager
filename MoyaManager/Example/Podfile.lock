@@ -1,27 +1,38 @@
 PODS:
-  - MoyaManager (0.1.0)
-  - Nimble (7.0.3)
+  - Alamofire (4.8.2)
+  - Moya (13.0.1):
+    - Moya/Core (= 13.0.1)
+  - Moya/Core (13.0.1):
+    - Alamofire (~> 4.1)
+    - Result (~> 4.1)
+  - MoyaManager (0.1.0):
+    - Alamofire
+    - Moya (~> 13.0)
   - Quick (1.2.0)
+  - Result (4.1.0)
 
 DEPENDENCIES:
   - MoyaManager (from `../`)
-  - Nimble (~> 7.0.2)
   - Quick (~> 1.2.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Nimble
+    - Alamofire
+    - Moya
     - Quick
+    - Result
 
 EXTERNAL SOURCES:
   MoyaManager:
     :path: "../"
 
 SPEC CHECKSUMS:
-  MoyaManager: 70f36bea29c5b3510abce0dd3e098839939b70cc
-  Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
+  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
+  Moya: f4a4b80ff2f8a4ffc208dfb31cd91636622fee6e
+  MoyaManager: ff5b9ec3989efe2dd784e5f9eefb14b300841e30
   Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
+  Result: bd966fac789cc6c1563440b348ab2598cc24d5c7
 
-PODFILE CHECKSUM: a7473af0e14be1ff0859e89b8969525513745b28
+PODFILE CHECKSUM: 93fb3918e6d584c5af06650b080684accf24896e
 
 COCOAPODS: 1.5.3
