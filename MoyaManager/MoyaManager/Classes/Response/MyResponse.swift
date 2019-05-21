@@ -12,7 +12,7 @@ import Moya
 func handleResponse(_ response: Moya.Response) throws -> Any {
     do {
         let json = try response.mapJSON()
-        
+    
         guard let dict = json as? [String : Any] else {
             throw NetworkError.dictionaryMapping(response)
         }

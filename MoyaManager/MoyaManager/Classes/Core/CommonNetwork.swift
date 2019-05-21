@@ -23,10 +23,10 @@ public func requestJson<T: MyServerType>(_ target: T,
                 let json = try response.mapJSON()
                 success(json)
             }catch (let error) {
-                failure(error as! MoyaError)
+                failure(NetworkError.moyaError(error as! MoyaError))
             }
         case let .failure(error):
-            failure(error);
+            failure(NetworkError.moyaError(error));
             break
         }
     }
@@ -45,7 +45,7 @@ public func request<T: MyServerType>(_ target: T,
         case let .success(response):
             success(response);
         case let .failure(error):
-            failure(error);
+            failure(NetworkError.moyaError(error));
             break
         }
     }

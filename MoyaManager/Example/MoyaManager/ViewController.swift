@@ -51,7 +51,7 @@ class ViewController: UIViewController {
             }
             
         }) { (error) in
-            
+            print("error: \(error)");
         }
         
     }

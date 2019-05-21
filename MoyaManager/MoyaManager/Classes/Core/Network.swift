@@ -10,7 +10,7 @@ import Foundation
 import Moya
 
 public typealias Success = (_ response: Moya.Response) -> Void
-public typealias Failure = (_ error: MoyaError) -> Void
+public typealias Failure = (_ error: NetworkError) -> Void
 public typealias JsonSuccess = (_ response: Any) -> Void
 
 
@@ -33,13 +33,13 @@ extension Networking {
             switch result {
             case let .success(response):
                 do {
-                    let json = try response.mapJSON()
+                    let json = try handleResponse(response)
                     success(json)
                 }catch (let error) {
-                    failure(error as! MoyaError)
+                    failure(error as! NetworkError)
                 }
             case let .failure(error):
-                failure(error)
+                failure(NetworkError.moyaError(error))
                 break
             }
         }
@@ -56,7 +56,7 @@ extension Networking {
             case let .success(response):
                 success(response);
             case let .failure(error):
-                failure(error);
+                failure(NetworkError.moyaError(error));
                 break
             }
         }
