@@ -1,440 +1,169 @@
-# Moya的使用
-
-## 关于Moya
-[Moya](https://github.com/Moya/Moya)是对[Alamofire](https://github.com/Alamofire/Alamofire)的再次封装。
-
-让我们用一张图来简单来对比一下直接用Alamofire和用moya的区别：
 
 
-![Moya Overview](Images/diagram.png)
+# 基于moya的二次封装的网络框架(swift)
+> 对于一个项目来说，网络层设计一直至关重要，最近在做一个swift的新项目，认真构思了一个星期，琢磨了一套swift方面的网络框架。仅供大家参考。
 
-## 有关Alamofire
-为了对Moya有更好的了解。让我们先复习一下Alamofire的用法。
+## 为什么选择moya
+moya是对Alamofire的再次封装。它可以实现各种自定义配置，真正实现了对网络层的高度抽象。
 
-### Alamofire的用法
-用法一:
+还有一个优秀的网络框架([github地址](https://github.com/mmoaay/Bamboots))，大家可以看看，跟`moya`对比一下。
 
-``` Swift
-let parameters: Parameters = [
-	"foo": [1,2,3],
-	"bar": [
-	"baz": "qux"
-]
-Alamofire.request("https://httpbin.org/post", method: .post, parameters: parameters, encoding: JSONEncoding.default)
-```
+有关moya的介绍可以看看: [Moya的使用](https://www.jianshu.com/p/2ee5258828ff)
 
-用法二：
+框架GitHub地址：[GitHub地址](https://github.com/chensx1993/moyaManager)
 
-``` Swift
-Alamofire.request("https://httpbin.org/get")
-.validate(statusCode: 200..<300)
-.validate(contentType: ["application/json"])
-.responseData { response in
-	switch response.result {
-	case .success:
-		print("Validation Successful")
-		case .failure(let error):
-		print(error)
-	}
-}
-```
+## 网络层设计
+现在我们默认大家都很熟练用`moya`了，我们想想一个网络层设计需要什么，怎么通过`moya`更好的实现。
 
-Alamofire请求时输入各种请求的条件(url, parameters, header,validate etc)的时候略显累赘，如果我们要设置默认parameters，还有针对特定API做修改的时候，实现起来就会很费劲。
+* *server层* ：可动态修改的域名，timeout，自定义HTTP parameters，header
+* *安全性* ：SSL
+* *缓存* ：沿用`moya`
+* *回调方法* ：沿用`moya`, `response`需要根据自己服务器返回格式做出修改
+* *拦截器* ：直接使用`moya`
 
-然后，就有了我们Moya。
-
-
-## Moya的简单实用
-
-### Moya的快速上手
-Moya是通过`POP`(面向协议编程)来设计的一个网络抽象库。
-
-moya简单使用的example:
+### server层
+我们先建个`WebService`类, 我目的是用来动态修改，虽然不一定你一修改，就马上能够应用到Network，ㄟ( ▔, ▔ )ㄏ，可是我们要保留这个设计。
 
 ``` Swift
-public enum GitHub {
-    case zen
-    case userProfile(String)
-    case userRepositories(String)
-}
-
-extension GitHub: TargetType {
-	// 略过
-}
-
-let provider = MoyaProvider<GitHub>()
-provider.request(.zen) { result in
-    // `result` is either .success(response) or .failure(error)
-}
-```
-
-
-#### 1. 创建一个Provider
-provider是网络请求的提供者，你所有的网络请求都通过provider来调用。我们先创建一个provider。
-
-provider最简单的创建方法:
-
-``` Swift
-// GitHub就是一个遵循TargetType协议的枚举(看上面例子)
-let provider = MoyaProvider<GitHub>()
-
-```
-
-让我看看provider是什么：
-
-``` Swift
-open class MoyaProvider<Target: TargetType>: MoyaProviderType {
-	//略过....
-}
-```
-
-provider是一个遵循	`MoyaProviderType`协议的公开类，**他需要传入一个遵循`TargetType`协议的对象名，这是泛型的常规用法，大家可以自行Google一下**。
-
-如果我们要创建provider，我们要看看他的构造方法:
-
-``` Swift
-/// Initializes a provider.
-    public init(endpointClosure: @escaping EndpointClosure = MoyaProvider.defaultEndpointMapping,
-                requestClosure: @escaping RequestClosure = MoyaProvider.defaultRequestMapping,
-                stubClosure: @escaping StubClosure = MoyaProvider.neverStub,
-                callbackQueue: DispatchQueue? = nil,
-                manager: Manager = MoyaProvider<Target>.defaultAlamofireManager(),
-                plugins: [PluginType] = [],
-                trackInflights: Bool = false) {
-
-        self.endpointClosure = endpointClosure
-        self.requestClosure = requestClosure
-        self.stubClosure = stubClosure
-        self.manager = manager
-        self.plugins = plugins
-        self.trackInflights = trackInflights
-        self.callbackQueue = callbackQueue
+class WebService: NSObject {
+    
+    var rootUrl: String = "https://api.github.com"
+    var manager: Alamofire.SessionManager = createManager()
+    var headers: [String: String]? = defaultHeaders()
+    var parameters: [String: Any]? = defaultParameters()
+    var timeoutIntervalForRequest: Double = 20.0
+    
+    static let sharedInstance = WebService()
+    private override init() {}
+    
+    static func defaultHeaders() -> [String : String]? {
+        return ["deviceID" : "qwertyyu1234545",
+                "Authorization": "tyirhjkkokjjjbggstvj"
+        ]
     }
     
-```
-
-provider所有的属性都是有默认值，具体怎么用我们往后再详谈。**现在主要是传入一个遵`TargetType`协议的对象**。
-
-#### 2. 创建一个遵循TargetType协议的enum
-
-让我们看看`TargetType`协议有什么:
-
-``` Swift
-public protocol TargetType {
-
-    /// The target's base `URL`.
-    var baseURL: URL { get }
-
-    /// The path to be appended to `baseURL` to form the full `URL`.
-    var path: String { get }
-
-    /// The HTTP method used in the request.
-    var method: Moya.Method { get }
-
-    /// Provides stub data for use in testing.
-    var sampleData: Data { get }
-
-    /// The type of HTTP task to be performed.
-    var task: Task { get }
-
-    /// The type of validation to perform on the request. Default is `.none`.
-    var validationType: ValidationType { get }
-
-    /// The headers to be used in the request.
-    var headers: [String: String]? { get }
-}
-```
-具体的使用方法如下：
-
-``` Swift
-public enum GitHub {
-    case zen
-    case userProfile(String)
-    case userRepositories(String)
-}
-
-extension GitHub: TargetType {
-    public var baseURL: URL { return URL(string: "https://api.github.com")! }
+    static func defaultParameters() -> [String : Any]? {
+        return ["platform" : "ios",
+                "version" : "1.2.3",
+        ]
+    }
     
-    // 对应的不同API path
-    public var path: String {
-        switch self {
-        case .zen:
-            return "/zen"
-        case .userProfile(let name):
-            return "/users/\(name.urlEscaped)"
-        case .userRepositories(let name):
-            return "/users/\(name.urlEscaped)/repos"
+    // 自定义 session manager
+    static func createManager() -> Alamofire.SessionManager {
+        let configuration = URLSessionConfiguration.default
+        configuration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
+        configuration.timeoutIntervalForRequest = 20.0
+        
+        let manager = Alamofire.SessionManager(configuration: configuration)
+        manager.startRequestsImmediately = false
+        return manager
+    }
+    
+}
+
+```
+
+### 自定义一个TargetType
+自定义一个适合自己的`TargetType`，可以扩展其他的属性，同时设置一些默认值：
+
+``` Swift
+public protocol MyServerType: TargetType {
+    var isShowLoading: Bool { get }
+    var parameters: [String: Any]? { get }
+    var stubBehavior: StubBehavior { get } //测试用的
+}
+
+extension MyServerType {
+    public var base: String { return WebService.sharedInstance.rootUrl }
+    
+    public var baseURL: URL { return URL(string: base)! }
+    
+    public var headers: [String : String]? { return WebService.sharedInstance.headers }
+    
+    public var parameters: [String: Any]? { return WebService.sharedInstance.parameters }
+    
+    public var isShowLoading: Bool { return false }
+    
+    public var task: Task {
+        let encoding: ParameterEncoding
+        switch self.method {
+        case .post:
+            encoding = JSONEncoding.default
+        default:
+            encoding = URLEncoding.default
         }
+        if let requestParameters = parameters {
+            return .requestParameters(parameters: requestParameters, encoding: encoding)
+        }
+        return .requestPlain
     }
+    
+    
     public var method: Moya.Method {
         return .get
     }
     
-    // parameters，upload or download
-    public var task: Task {
-        switch self {
-        case .userRepositories:
-            return .requestParameters(parameters: ["sort": "pushed"], encoding: URLEncoding.default)
-        default:
-            return .requestPlain
-        }
-    }
-    
-    // 通过statuscode过滤返回内容
-    public var validationType: ValidationType {
-        switch self {
-        case .zen:
-            return .successCodes
-        default:
-            return .none
-        }
-    }
-    
-    // 多用于单元测试
     public var sampleData: Data {
-        switch self {
-        case .zen:
-            return "Half measures are as bad as nothing at all.".data(using: String.Encoding.utf8)!
-        case .userProfile(let name):
-            return "{\"login\": \"\(name)\", \"id\": 100}".data(using: String.Encoding.utf8)!
-        case .userRepositories(let name):
-            return "[{\"name\": \"\(name)\"}]".data(using: String.Encoding.utf8)!
-        }
+        return "response: test data".data(using: String.Encoding.utf8)!
     }
-    public var headers: [String: String]? {
-        return nil
+    
+    public var validationType: ValidationType {
+        return .successCodes
     }
 }
 ```
-TargetType的设计理念是，先创建一个enum，如`Github`，那代表是你的服务器，case1，case2，case3代表各个API，这样就能统一处理，还可以针对个别API做不同的处理。
 
-设置好了配置，就可以简单创建一个Provider了:
+### 设置一个通用的Provider
+ 新建一个网络管理的结构体，方便以后扩展:
 
 ``` Swift
-let provider = MoyaProvider<GitHub>()
+public struct Networking<T: MyServerType> {
+    public let provider: MoyaProvider<T> = newProvider(plugins)
+    
+    public init() {
+    }
+}
 
 ```
 
+ 设置一个通用的Provider，可自定义多个属性。
 
-### 3. 网络请求方法
-
-创建好了Provider，我们就可以直接调用网络请求了:
+* 自定义`endpointClosure`, 可额外添加`Request Header`, 修改`task`等
 
 ``` Swift
- gitHubProvider.request(.zen) { result in
-            var message = "Couldn't access API"
-            if case let .success(response) = result {
-                let jsonString = try? response.mapString()
-                message = jsonString ?? message
+static func endpointsClosure<T>() -> (T) -> Endpoint where T: MyServerType {
+        return { target in
+            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+            return defaultEndpoint;
+        }
+    }
+```
+
+* 自定义`requestClosure `，可对`request`进行进一步修改。
+
+``` Swift
+static func endpointResolver() -> MoyaProvider<T>.RequestClosure {
+        return { (endpoint, closure) in
+            do {
+                var request = try endpoint.urlRequest()
+                request.httpShouldHandleCookies = false
+                closure(.success(request))
+            } catch let error {
+                closure(.failure(MoyaError.underlying(error, nil)))
             }
-
-            self.showAlert("Zen", message: message)
         }
-```
-`request()` 方法返回一个`Cancellable`, 它有一个你可以取消request的公共的方法。
-
-### 4. Result
-
-网络请求有个回调，回调一个`Result`类型的数据:
-
-``` Swift
-Result<Moya.Response, MoyaError>
-```
-再看看具体定义：
-
-``` Swift
-public enum Result<Value, Error: Swift.Error>: ResultProtocol, CustomStringConvertible, CustomDebugStringConvertible {
-
-    case success(Value)
-    
-    case failure(Error)
-    
-    //其他略过
-}
-```
-这是一个枚举，通过枚举获取对应`value`，`error`；
-
-这也是一个泛型的经典用法，其中 `Value` 对应 `Moya.Response`， `Error` 对应 `MoyaError`。
-
-``` Swift
- gitHubProvider.request(.zen) { result in
-            switch self {
-				case let .success(response):
-				   let json = try response.mapJSON()
-					print("\(json)");
-					
-				case let .failure(error):
-					break;
-				}
-        }
-
-```
-
-`Moya.Response`是`public final class`, 里面有一些好用的方法:
-
-``` Swift
-// 转换为Image
-func mapImage() throws -> Image;
-
-// 转换为Json
-func mapJSON(failsOnEmptyData: Bool = true) throws -> Any;
-
-// 装换为String
-func mapString(atKeyPath keyPath: String? = nil) throws -> String;
-
-// 转换为对应的model
-func map<D: Decodable>(_ type: D.Type, atKeyPath keyPath: String? = nil, using decoder: JSONDecoder = JSONDecoder(), failsOnEmptyData: Bool = true) throws -> D;
-```
-
-有关`Moya.Response`，`MoyaError`大家可自行看看源码，有很多好用的属性及方法。
-
-
-## Moya的高级用法
-Moya实现了网络层的高度抽象，它是通过以下管道来实现这一点的：
-![Moya Overview](Images/moya_request.png)
-
-让我们回顾一下，`Provider`的构造方法:
-
-``` Swift
-/// Initializes a provider.
-    public init(endpointClosure: @escaping EndpointClosure = MoyaProvider.defaultEndpointMapping,
-                requestClosure: @escaping RequestClosure = MoyaProvider.defaultRequestMapping,
-                stubClosure: @escaping StubClosure = MoyaProvider.neverStub,
-                callbackQueue: DispatchQueue? = nil,
-                manager: Manager = MoyaProvider<Target>.defaultAlamofireManager(),
-                plugins: [PluginType] = [],
-                trackInflights: Bool = false) {
-
-        self.endpointClosure = endpointClosure
-        self.requestClosure = requestClosure
-        self.stubClosure = stubClosure
-        self.manager = manager
-        self.plugins = plugins
-        self.trackInflights = trackInflights
-        self.callbackQueue = callbackQueue
     }
-    
 ```
 
-Provider输入的参数包括：`EndpointClosure `,`RequestClosure `,`StubClosure `, `callbackQueue `,`plugins `, `trackInflights `。
-
-### Endpoints
-> `Provider` 将 `Targets` 映射成 `Endpoints `, 然后再将 `Endpoints ` 映射成真正的 `Request`。
-
-而`EndpointClosure = (Target) -> Endpoint`就是定义如何将 `Targets 映射为 `Endpoints `
-
-在这个闭包中，你可以改变`task`，`method`，`url`, `headers` 或者 `sampleResponse `。比如，我们可能希望将应用程序名称设置到HTTP头字段中，从而用于服务器端分析。
+* 自定义`stubClosure `，可用来显示离线数据，模拟延迟测试，还有`Unit test`。
 
 ``` Swift
-let endpointClosure = { (target: MyTarget) -> Endpoint in
-    let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-    return defaultEndpoint.adding(newHTTPHeaderFields: ["APP_NAME": "MY_AWESOME_APP"])
-}
-let provider = MoyaProvider<GitHub>(endpointClosure: endpointClosure)
-```
-
-### requestClosure
-前面`endpointClosure `会把`target`映射为`endpoint`, Moya会把`endpoint`转换为一个真正的`Request`。
-
-`RequestClosure = (Endpoint, @escaping RequestResultClosure) -> Void` 就是 `Endpoint` 转换为 `Request`的一个拦截，它还可以修改请求的结果( 通过调用`RequestResultClosure = (Result<URLRequest, MoyaError>)` )
-
-``` Swift
-let requestClosure = { (endpoint: Endpoint, done: MoyaProvider.RequestResultClosure) in
-    do {
-        var request = try endpoint.urlRequest()
-        // Modify the request however you like.
-        done(.success(request))
-    } catch {
-        done(.failure(MoyaError.underlying(error)))
+static func APIKeysBasedStubBehaviour<T>(_ target: T) -> Moya.StubBehavior where T: MyServerType {
+        return target.stubBehavior;
     }
-
-}
-let provider = MoyaProvider<GitHub>(requestClosure: requestClosure)
 ```
-
-### stubClosure
-
-下一个选择是来提供一个`stubClosure`。这个闭包返回 `.never` (默认的), `.immediate` 或者可以把stub请求延迟指定时间的`.delayed(seconds)`三个中的一个。 例如, `.delayed(0.2)` 可以把每个stub 请求延迟0.2s. 这个在单元测试中来模拟网络请求是非常有用的。
-
-更棒的是如果您需要对请求进行区别性的stub，那么您可以使用自定义的闭包。
-
-``` Swift
-let provider = MoyaProvider<MyTarget>(stubClosure: { target: MyTarget -> Moya.StubBehavior in
-    switch target {
-        /* Return something different based on the target. */
-    }
-})
-```
-
-### manager
-`Provider`里面你可以自定义一个 `Alamofire.Manager`实例对象。
-
-``` Swift
-// 这是Moya默认的manager
-public final class func defaultAlamofireManager() -> Manager {
-    let configuration = URLSessionConfiguration.default
-    configuration.httpAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders
-
-    let manager = Alamofire.Manager(configuration: configuration)
-    manager.startRequestsImmediately = false //设定false，为了单元测试
-    return manager
-}
-```
-用法如下：
-
-``` Swift
-let userModuleProvider = MoyaProvider<UserModule>(manager:yourManager)
-```
-
-### plugins(插件)
-最后, 您可能也提供一个`plugins`数组给`provider`。 这些插件会在请求被发送前及响应收到后被执行。 `Moya`已经提供了一些插件: 一个是 网络活动(`NetworkActivityPlugin`),一个是记录所有的 网络活动 (`NetworkLoggerPlugin`), 还有一个是 HTTP Authentication。
-
-`plugins`里面的对象都遵循协议`PluginType`, 协议了规定了几种方法，阐述了什么时候会被调用。
-
-``` Swift
-public protocol PluginType {
-    /// modified Request 请求发送之前调用(主要用于修改request)
-    /// Called to modify a request before sending.
-    func prepare(_ request: URLRequest, target: TargetType) -> URLRequest
-
-    /// Request 请求发送之前调用
-    /// Called immediately before a request is sent over the network (or stubbed).
-    func willSend(_ request: RequestType, target: TargetType)
-
-    /// 接收到了response，completion handler 之前调用
-    /// Called after a response has been received, but before the MoyaProvider has invoked its completion handler.
-    func didReceive(_ result: Result<Moya.Response, MoyaError>, target: TargetType)
-
-    /// completion handler 之前调用(主要用于修改result)
-    /// Called to modify a result before completion.
-    func process(_ result: Result<Moya.Response, MoyaError>, target: TargetType) -> Result<Moya.Response, MoyaError>
-}
-```
-
-Moya已经有了一个`NetworkActivityPlugin `:
-
-``` Swift
-public final class NetworkActivityPlugin: PluginType {
-
-    public typealias NetworkActivityClosure = (_ change: NetworkActivityChangeType, _ target: TargetType) -> Void
-    let networkActivityClosure: NetworkActivityClosure
-
-    public init(networkActivityClosure: @escaping NetworkActivityClosure) {
-        self.networkActivityClosure = networkActivityClosure
-    }
-
-    public func willSend(_ request: RequestType, target: TargetType) {
-        networkActivityClosure(.began, target)
-    }
-
-    public func didReceive(_ result: Result<Moya.Response, MoyaError>, target: TargetType) {
-        networkActivityClosure(.ended, target)
-    }
-}
-```
-
-它的用法也好简单：
+  
+* 自定义`plugins`, 拦截器
 
 ``` Swift
 static var plugins: [PluginType] {
@@ -455,7 +184,50 @@ static var plugins: [PluginType] {
             activityPlugin, myLoggorPlugin
         ]
     }
-    
- let userModuleProvider = MoyaProvider<UserModule>(plugins: plugins)
-    
 ```
+
+### 网络请求方法
+网络请求方法，没有多做设计，常规用法。
+
+``` Swift
+@discardableResult
+    public func requestJson(_ target: T,
+                            callbackQueue: DispatchQueue? = DispatchQueue.main,
+                            progress: ProgressBlock? = .none,
+                            success: @escaping JsonSuccess,
+                            failure: @escaping Failure) -> Cancellable {
+        return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
+            switch result {
+            case let .success(response):
+                do {
+                    let json = try handleResponse(response)
+                    success(json)
+                }catch (let error) {
+                    failure(error as! NetworkError)
+                }
+            case let .failure(error):
+                failure(NetworkError.moyaError(error))
+                break
+            }
+        }
+    }
+```
+
+#### 自定义网络层Error
+`Moya.MoyaError`设计已经很完善了，针对业务层，可以再扩展一下：
+
+``` Swift
+public enum NetworkError: Error  {
+    
+    case dictionaryMapping(Response)
+
+    case serverResponse(message: String?, code: Int, response: Response)
+    
+    case moyaError(Moya.MoyaError)
+    
+    case unknownError(Response)
+}
+```
+
+## 总结
+该框架还没有进行大规模的应用，有什么错漏的地方，欢迎大家提出，大家有什么更好的设计，可以评论。
