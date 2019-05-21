@@ -90,8 +90,8 @@ extension Networking {
         }
     }
     
-    static func APIKeysBasedStubBehaviour<T>(_: T) -> Moya.StubBehavior {
-        return .never;
+    static func APIKeysBasedStubBehaviour<T>(_ target: T) -> Moya.StubBehavior where T: MyServerType {
+        return target.stubBehavior;
     }
     
     static var plugins: [PluginType] {
@@ -116,7 +116,7 @@ extension Networking {
     
 }
 
-public func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServerType {
+func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServerType {
     return MoyaProvider(endpointClosure: Networking<T>.endpointsClosure(),
                         requestClosure: Networking<T>.endpointResolver(),
                         stubClosure: Networking<T>.APIKeysBasedStubBehaviour,

@@ -8,6 +8,7 @@
 
 import Foundation
 import MoyaManager
+import Moya
 
 let networking  = Networking<CommonAPI>()
 let gitHubNetworking = Networking<GitHub>()
@@ -34,6 +35,11 @@ extension GitHub: MyServerType {
     public var parameters: [String: Any]? {
         return ["sort": "pushed"]
     }
+    
+    public var stubBehavior: StubBehavior {
+        return .delayed(seconds: 5)
+    }
+    
 }
 
 extension String {

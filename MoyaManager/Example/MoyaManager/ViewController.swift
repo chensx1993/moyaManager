@@ -33,6 +33,17 @@ class ViewController: UIViewController {
             print("\n\n=========gitHubNetworking error:\n\(error)\n============")
         }
         
+        gitHubNetworking.request(.userProfile("chensx1993"), success: { (response) in
+            do {
+                let json = try response.mapString()
+                print("gitHubNetworking.request: \(json)");
+                
+            } catch(let error) {
+                print("error: \(error)");
+            }
+        }) { (error) in
+            
+        }
     }
     
     func commonReques() {

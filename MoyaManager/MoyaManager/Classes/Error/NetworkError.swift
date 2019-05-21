@@ -19,3 +19,15 @@ public enum NetworkError: Error  {
     
     case unknownError(Response)
 }
+
+public extension NetworkError {
+    
+    var response: Moya.Response? {
+        switch self {
+        case .dictionaryMapping(let response): return response
+        case .serverResponse(_, _, let response): return response
+        case .moyaError(let error): return error.response
+        case .unknownError(let response): return response
+        }
+    }
+}

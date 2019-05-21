@@ -12,6 +12,7 @@ import Moya
 public protocol MyServerType: TargetType {
     var isShowLoading: Bool { get }
     var parameters: [String: Any]? { get }
+    var stubBehavior: StubBehavior { get }
 }
 
 extension MyServerType {
@@ -50,6 +51,10 @@ extension MyServerType {
     
     public var validationType: ValidationType {
         return .successCodes
+    }
+    
+    public var stubBehavior: StubBehavior {
+        return .never
     }
 }
 
