@@ -11,6 +11,7 @@ import Moya
 
 public typealias Success = (_ response: Moya.Response) -> Void
 public typealias Failure = (_ error: MoyaError) -> Void
+public typealias JsonSuccess = (_ response: Any) -> Void
 
 
 public struct Networking<T: MyServerType> {
@@ -26,7 +27,7 @@ extension Networking {
     public func requestJson(_ target: T,
                             callbackQueue: DispatchQueue? = DispatchQueue.main,
                             progress: ProgressBlock? = .none,
-                            success: @escaping (_ response: Any) -> Void,
+                            success: @escaping JsonSuccess,
                             failure: @escaping Failure) -> Cancellable {
         return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
@@ -38,7 +39,7 @@ extension Networking {
                     failure(error as! MoyaError)
                 }
             case let .failure(error):
-                failure(error);
+                failure(error)
                 break
             }
         }

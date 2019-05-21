@@ -19,14 +19,24 @@ class ViewController: UIViewController {
     }
 
     func testRequestJson() {
+        
         requestJson(GitHub.userProfile("chensx1993"), success: { (json) in
             print("\n\n=========json:\n\(json)\n============")
         }) { (error) in
-            
+            print("\n\n=========error:\n\(error)\n============")
         }
+        
+        gitHubNetworking.requestJson(.userProfile("chensx1993"), success: { (json) in
+             print("\n\n=========gitHubNetworking json:\n\(json)\n============")
+            
+        }) { (error) in
+            print("\n\n=========gitHubNetworking error:\n\(error)\n============")
+        }
+        
     }
     
     func commonReques() {
+        
         let username = "chensx1993".urlEscaped
         let url = "https://api.github.com/users/\(username)"
         let parameters = ["sort": "pushed"]
@@ -38,13 +48,14 @@ class ViewController: UIViewController {
                 
             } catch(let error) {
                 print("error: \(error)");
-//                self.showAlert("error", message: "mapping string error: \(error)");
             }
             
         }) { (error) in
             
         }
+        
     }
+    
 
 }
 

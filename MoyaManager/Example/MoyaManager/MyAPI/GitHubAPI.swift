@@ -10,6 +10,7 @@ import Foundation
 import MoyaManager
 
 let networking  = Networking<CommonAPI>()
+let gitHubNetworking = Networking<GitHub>()
 
 public enum GitHub {
     case zen
