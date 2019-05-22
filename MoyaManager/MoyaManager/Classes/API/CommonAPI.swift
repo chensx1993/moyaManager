@@ -38,7 +38,7 @@ extension CommonAPI: MyServerType {
     }
     
      public var parameters: [String: Any]? {
-        var requeseParameters = WebService.sharedInstance.parameters
+        var requeseParameters = WebService.shared.parameters
         
         var newParameters: [String: Any]?
         

@@ -16,13 +16,13 @@ public protocol MyServerType: TargetType {
 }
 
 extension MyServerType {
-    public var base: String { return WebService.sharedInstance.rootUrl }
+    public var base: String { return WebService.shared.rootUrl }
     
     public var baseURL: URL { return URL(string: base)! }
     
-    public var headers: [String : String]? { return WebService.sharedInstance.headers }
+    public var headers: [String : String]? { return WebService.shared.headers }
     
-    public var parameters: [String: Any]? { return WebService.sharedInstance.parameters }
+    public var parameters: [String: Any]? { return WebService.shared.parameters }
     
     public var isShowLoading: Bool { return false }
     

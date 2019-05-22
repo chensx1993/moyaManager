@@ -15,9 +15,10 @@ public typealias JsonSuccess = (_ response: Any) -> Void
 
 
 public struct Networking<T: MyServerType> {
-    public let provider: MoyaProvider<T> = newProvider(plugins)
+    public let provider: MoyaProvider<T>
     
-    public init() {
+    public init(provider: MoyaProvider<T> = newDefaultProvider()) {
+        self.provider = provider
     }
 }
 
@@ -66,7 +67,11 @@ extension Networking {
 
 extension Networking {
     
-    static func newDefaultNetworking() -> Networking {
+    public static func newDefaultProvider() -> MoyaProvider<T> {
+        return newProvider(plugins)
+    }
+    
+    public static func newDefaultNetworking() -> Networking {
         return Networking()
     }
     
@@ -83,6 +88,7 @@ extension Networking {
             do {
                 var request = try endpoint.urlRequest()
                 request.httpShouldHandleCookies = false
+                request.timeoutInterval = WebService.shared.timeoutInterval
                 closure(.success(request))
             } catch let error {
                 closure(.failure(MoyaError.underlying(error, nil)))
@@ -120,7 +126,7 @@ func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServ
     return MoyaProvider(endpointClosure: Networking<T>.endpointsClosure(),
                         requestClosure: Networking<T>.endpointResolver(),
                         stubClosure: Networking<T>.APIKeysBasedStubBehaviour,
-                        manager:WebService.sharedInstance.manager,
+                        manager:WebService.shared.manager,
                         plugins: plugins)
 }
 

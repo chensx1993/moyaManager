@@ -16,9 +16,9 @@ class WebService: NSObject {
     var manager: Alamofire.SessionManager = createManager()
     var headers: [String: String]? = defaultHeaders()
     var parameters: [String: Any]? = defaultParameters()
-    var timeoutIntervalForRequest: Double = 20.0
+    var timeoutInterval: Double = 20.0
     
-    static let sharedInstance = WebService()
+    static let shared = WebService()
     private override init() {}
     
     static func defaultHeaders() -> [String : String]? {
@@ -48,7 +48,7 @@ class WebService: NSObject {
 
 func myBaseUrl(_ path: String) -> String {
     if path.isCompleteUrl { return path }
-    return WebService.sharedInstance.rootUrl;
+    return WebService.shared.rootUrl;
 }
 
 func myPath(_ path: String) -> String {
