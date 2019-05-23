@@ -37,7 +37,7 @@ extension GitHub: MyServerType {
     }
     
     public var stubBehavior: StubBehavior {
-        return .delayed(seconds: 5)
+        return .never
     }
     
 }

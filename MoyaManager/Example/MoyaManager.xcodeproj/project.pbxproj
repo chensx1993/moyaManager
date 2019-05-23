@@ -10,6 +10,7 @@
 		2B5408B6228D4966009486F0 /* GitHubAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5408B4228D4966009486F0 /* GitHubAPI.swift */; };
 		2BBF902F2294F7A40012B13A /* ServerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBF902D2294F6760012B13A /* ServerTest.swift */; };
 		2BBF90322294FE8B0012B13A /* BaseTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBF90312294FE8B0012B13A /* BaseTestCase.swift */; };
+		2BBF90C422964CFB0012B13A /* UserProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBF90C322964CFB0012B13A /* UserProfileModel.swift */; };
 		2D52771AD0F89D1EA32C1C79 /* Pods_MoyaManager_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D15D5BD771059BC9CE5DD8C /* Pods_MoyaManager_Tests.framework */; };
 		47DA4DD58B22E80CEF898BB3 /* Pods_MoyaManager_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E799B61E17D9134E79F7822B /* Pods_MoyaManager_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -34,6 +35,7 @@
 		2B5408B4228D4966009486F0 /* GitHubAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GitHubAPI.swift; sourceTree = "<group>"; };
 		2BBF902D2294F6760012B13A /* ServerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerTest.swift; sourceTree = "<group>"; };
 		2BBF90312294FE8B0012B13A /* BaseTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTestCase.swift; sourceTree = "<group>"; };
+		2BBF90C322964CFB0012B13A /* UserProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileModel.swift; sourceTree = "<group>"; };
 		58CC9D4088F98C4B62072F3F /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* MoyaManager_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoyaManager_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -83,6 +85,14 @@
 			path = MyAPI;
 			sourceTree = "<group>";
 		};
+		2BBF90C222964C6E0012B13A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2BBF90C322964CFB0012B13A /* UserProfileModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		382C16598E4CFED53C2A3D5F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +126,7 @@
 		607FACD21AFB9204008FA782 /* Example for MoyaManager */ = {
 			isa = PBXGroup;
 			children = (
+				2BBF90C222964C6E0012B13A /* Model */,
 				2B5408B3228D4966009486F0 /* MyAPI */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
@@ -348,6 +359,7 @@
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				2B5408B6228D4966009486F0 /* GitHubAPI.swift in Sources */,
+				2BBF90C422964CFB0012B13A /* UserProfileModel.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

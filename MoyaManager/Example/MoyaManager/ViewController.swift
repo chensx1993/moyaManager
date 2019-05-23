@@ -35,8 +35,8 @@ class ViewController: UIViewController {
         
         gitHubNetworking.request(.userProfile("chensx1993"), success: { (response) in
             do {
-                let json = try response.mapString()
-                print("gitHubNetworking.request: \(json)");
+                let model = try response.map(UserProfileModel.self)
+                print("gitHubNetworking.request: \(model)");
                 
             } catch(let error) {
                 print("error: \(error)");
