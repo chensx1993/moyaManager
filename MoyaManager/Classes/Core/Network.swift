@@ -1,6 +1,6 @@
 //
 //  Network.swift
-//  MoyaDemo
+//  MoyaManager
 //
 //  Created by 陈思欣 on 2019/5/8.
 //  Copyright © 2019 chensx. All rights reserved.
@@ -30,34 +30,30 @@ extension Networking {
                             progress: ProgressBlock? = .none,
                             success: @escaping JsonSuccess,
                             failure: @escaping Failure) -> Cancellable {
-        return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
-            switch result {
-            case let .success(response):
-                do {
-                    let json = try handleResponse(response)
-                    success(json)
-                }catch (let error) {
-                    failure(error as! NetworkError)
-                }
-            case let .failure(error):
-                failure(NetworkError.moyaError(error))
-                break
+        return self.request(target, callbackQueue: callbackQueue, progress: progress, success: { (response) in
+            do {
+                let json = try handleResponse(response)
+                success(json)
+            }catch (let error) {
+                failure(error as! NetworkError)
             }
+        }) { (error) in
+            failure(error)
         }
     }
     
     @discardableResult
     public func request(_ target: T,
-                 callbackQueue: DispatchQueue? = DispatchQueue.main,
-                 progress: ProgressBlock? = .none,
-                 success: @escaping Success,
-                 failure: @escaping Failure) -> Cancellable {
+                        callbackQueue: DispatchQueue? = DispatchQueue.main,
+                        progress: ProgressBlock? = .none,
+                        success: @escaping Success,
+                        failure: @escaping Failure) -> Cancellable {
         return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
             case let .success(response):
                 success(response);
             case let .failure(error):
-                failure(NetworkError.moyaError(error));
+                failure(NetworkError.init(error: error));
                 break
             }
         }
@@ -71,17 +67,18 @@ extension Networking {
         return newProvider(plugins)
     }
     
-    public static func newDefaultNetworking() -> Networking {
-        return Networking()
-    }
-    
     static func endpointsClosure<T>() -> (T) -> Endpoint where T: MyServerType {
         return { target in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+            let defaultEndpoint = Endpoint(
+                url: URL(target: target).absoluteString,
+                sampleResponseClosure: { target.sampleResponse },
+                method: target.method,
+                task: target.task,
+                httpHeaderFields: target.headers
+            )
             return defaultEndpoint;
         }
     }
-    
     
     static func endpointResolver() -> MoyaProvider<T>.RequestClosure {
         return { (endpoint, closure) in
@@ -126,7 +123,7 @@ func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServ
     return MoyaProvider(endpointClosure: Networking<T>.endpointsClosure(),
                         requestClosure: Networking<T>.endpointResolver(),
                         stubClosure: Networking<T>.APIKeysBasedStubBehaviour,
-                        manager:WebService.shared.manager,
+                        manager: WebService.shared.manager,
                         plugins: plugins)
 }
 

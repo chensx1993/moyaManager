@@ -33,13 +33,12 @@ class WebService: NSObject {
         ]
     }
     
-    // session manager
     static func createManager() -> Alamofire.SessionManager {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
         configuration.timeoutIntervalForRequest = 20.0
         
-        let manager = Alamofire.SessionManager(configuration: configuration)
+        let manager = Alamofire.SessionManager(configuration: configuration, serverTrustPolicyManager:ServerTrustPolicyManager.defaultManager)
         manager.startRequestsImmediately = false
         return manager
     }
@@ -58,7 +57,8 @@ func myPath(_ path: String) -> String {
 
 extension String {
     var isCompleteUrl: Bool {
-        if self.contains("http") { return true }
+        let scheme = self.lowercased()
+        if scheme.contains("http") { return true }
         return false
     }
 }

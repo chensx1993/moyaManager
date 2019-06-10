@@ -1,6 +1,6 @@
 //
 //  String+Extension.swift
-//  MoyaDemo
+//  MoyaManager
 //
 //  Created by hsbcnet.mobile.uk hsbcnet.mobile.uk on 2019/5/10.
 //  Copyright © 2019 chensx. All rights reserved.
