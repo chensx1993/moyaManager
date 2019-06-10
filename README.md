@@ -99,17 +99,18 @@ class WebService: NSObject {
 public protocol MyServerType: TargetType {
     var isShowLoading: Bool { get }
     var parameters: [String: Any]? { get }
-    var stubBehavior: StubBehavior { get } //测试用的
+    var stubBehavior: MyStubBehavior { get } //测试用的
+    var sampleResponse: MySampleResponse { get } //测试用的
 }
 
 extension MyServerType {
-    public var base: String { return WebService.sharedInstance.rootUrl }
+    public var base: String { return WebService.shared.rootUrl }
     
     public var baseURL: URL { return URL(string: base)! }
     
-    public var headers: [String : String]? { return WebService.sharedInstance.headers }
+    public var headers: [String : String]? { return WebService.shared.headers }
     
-    public var parameters: [String: Any]? { return WebService.sharedInstance.parameters }
+    public var parameters: [String: Any]? { return WebService.shared.parameters }
     
     public var isShowLoading: Bool { return false }
     
@@ -128,16 +129,25 @@ extension MyServerType {
     }
     
     
-    public var method: Moya.Method {
-        return .get
+    public var method: HTTPMethod {
+        return .post
+    }
+    
+    public var validationType: MyValidationType {
+        return .successCodes
+    }
+    
+    public var stubBehavior: StubBehavior {
+        return .never
     }
     
     public var sampleData: Data {
         return "response: test data".data(using: String.Encoding.utf8)!
     }
     
-    public var validationType: ValidationType {
-        return .successCodes
+    //可 mock 404，500 etc response
+    public var sampleResponse: MySampleResponse {
+        return .networkResponse(200, self.sampleData)
     }
 }
 ```
@@ -216,26 +226,77 @@ static var plugins: [PluginType] {
 ```
 
 ### 网络请求方法
-网络请求方法，没有多做设计，常规用法。
+网络请求方法，总有一些小伙伴难以接受`Moya`利用`enum`的用法,所以设计两种用法:
+
+用法一：
 
 ``` Swift
-@discardableResult
+
+/// 直接传参，进行网络请求
+extension Network {
+    @discardableResult
+    public static func get(_ url: String,
+                    parameters: [String : Any]? = nil,
+                    headers: [String : String]? = nil,
+                    callbackQueue: DispatchQueue? = DispatchQueue.main,
+                    progress: ProgressBlock? = .none,
+                    success: @escaping Success,
+                    failure: @escaping Failure) -> Cancellable {
+        
+        let network = Networking<CommonAPI>()
+        return network.request(.get(url, parameters: parameters, header: headers), callbackQueue: callbackQueue, progress: progress, success: success, failure: failure)
+    }
+    
+    @discardableResult
+    public static func post(_ url: String,
+                     parameters: [String : Any]? = nil,
+                     headers: [String : String]? = nil,
+                     callbackQueue: DispatchQueue? = DispatchQueue.main,
+                     progress: ProgressBlock? = .none,
+                     success: @escaping Success,
+                     failure: @escaping Failure) -> Cancellable {
+        
+        let network = Networking<CommonAPI>()
+        return network.request(.post(url, parameters: parameters, header: headers), callbackQueue: callbackQueue, progress: progress, success: success, failure: failure)
+    }
+}
+```
+
+用法二：
+
+``` Swift
+
+/// Moya常规用法
+    @discardableResult
     public func requestJson(_ target: T,
                             callbackQueue: DispatchQueue? = DispatchQueue.main,
                             progress: ProgressBlock? = .none,
                             success: @escaping JsonSuccess,
                             failure: @escaping Failure) -> Cancellable {
+        return self.request(target, callbackQueue: callbackQueue, progress: progress, success: { (response) in
+            do {
+                let json = try handleResponse(response)
+                success(json)
+            }catch (let error) {
+                failure(error as! NetworkError)
+            }
+        }) { (error) in
+            failure(error)
+        }
+    }
+    
+    @discardableResult
+    public func request(_ target: T,
+                        callbackQueue: DispatchQueue? = DispatchQueue.main,
+                        progress: ProgressBlock? = .none,
+                        success: @escaping Success,
+                        failure: @escaping Failure) -> Cancellable {
         return self.provider.request(target, callbackQueue: callbackQueue, progress: progress) { (result) in
             switch result {
             case let .success(response):
-                do {
-                    let json = try handleResponse(response)
-                    success(json)
-                }catch (let error) {
-                    failure(error as! NetworkError)
-                }
+                success(response);
             case let .failure(error):
-                failure(NetworkError.moyaError(error))
+                failure(NetworkError.init(error: error));
                 break
             }
         }
@@ -243,18 +304,37 @@ static var plugins: [PluginType] {
 ```
 
 #### 自定义网络层Error
-`Moya.MoyaError`设计已经很完善了，针对业务层，可以再扩展一下：
+最近项目需要，研究了一下`Moya.MoyaError`，发现`Moya`的`Error`处理有点混乱，没有`Alamofire`处理得优美，所以自己又重写了一遍。
 
 ``` Swift
-public enum NetworkError: Error  {
+public enum NetworkError: Swift.Error {
     
-    case dictionaryMapping(Response)
-
-    case serverResponse(message: String?, code: Int, response: Response)
+    /// Indicates a response failed to map to an image.
+    case imageMapping(Response)
     
-    case moyaError(Moya.MoyaError)
+    /// Indicates a response failed to map to a JSON structure.
+    case jsonMapping(Response)
     
-    case unknownError(Response)
+    /// Indicates a response failed to map to a String.
+    case stringMapping(Response)
+    
+    /// Indicates a response failed to map to a Decodable object.
+    case objectMapping(Swift.Error, Response)
+    
+    /// Indicates that Encodable couldn't be encoded into Data
+    case encodableMapping(Swift.Error)
+    
+    /// Indicates a response failed with an invalid HTTP status code.
+    case statusCode(Response)
+    
+    /// fails to create a valid `URL`.
+    case invalidURL
+    
+    /// when a parameter encoding object throws an error during the encoding process.
+    case parameterEncodingFailed(Swift.Error)
+    
+    /// Indicates a response failed due to an underlying `Error`.
+    case underlying(Swift.Error, Response?)
 }
 ```
 
