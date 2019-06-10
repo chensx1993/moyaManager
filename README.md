@@ -157,10 +157,11 @@ extension MyServerType {
 
 ``` Swift
 public struct Networking<T: MyServerType> {
-    public let provider: MoyaProvider<T> = newProvider(plugins)
-    
-    public init() {
-    }
+public let provider: MoyaProvider<T>
+
+public init(provider: MoyaProvider<T> = newDefaultProvider()) {
+self.provider = provider
+}
 }
 
 ```
