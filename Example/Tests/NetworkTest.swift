@@ -25,6 +25,24 @@ class NetworkTest: XCTestCase {
         gitHubNetwork = nil
     }
     
+    func testRequestGetJson() {
+        let expectation = self.expectation(description: "request json")
+        
+        var json: Any?
+        
+        Network.getJson("https://api.github.com/users/chensx1993", success: { (response) in
+            json = response
+            expectation.fulfill()
+        }) { (error) in
+            json = []
+            expectation.fulfill()
+        }
+        
+        waitForExpectations(timeout: timeOut, handler: nil)
+        
+        XCTAssertNotNil(json)
+    }
+    
     // 用法一：简单调用URL，不需要额外创建 enum
     func testGetRequest() {
         

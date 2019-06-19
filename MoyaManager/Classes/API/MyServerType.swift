@@ -68,4 +68,22 @@ extension MyServerType {
     }
 }
 
+func myBaseUrl(_ path: String) -> String {
+    if path.isCompleteUrl { return path }
+    return WebService.shared.rootUrl;
+}
+
+func myPath(_ path: String) -> String {
+    if path.isCompleteUrl { return "" }
+    return path;
+}
+
+extension String {
+    var isCompleteUrl: Bool {
+        let scheme = self.lowercased()
+        if scheme.contains("http") { return true }
+        return false
+    }
+}
+
 

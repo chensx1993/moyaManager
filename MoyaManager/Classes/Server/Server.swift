@@ -13,7 +13,6 @@ import Moya
 class WebService: NSObject {
     
     var rootUrl: String = "https://api.github.com"
-    var manager: Alamofire.SessionManager = createManager()
     var headers: [String: String]? = defaultHeaders()
     var parameters: [String: Any]? = defaultParameters()
     var timeoutInterval: Double = 20.0
@@ -33,32 +32,5 @@ class WebService: NSObject {
         ]
     }
     
-    static func createManager() -> Alamofire.SessionManager {
-        let configuration = URLSessionConfiguration.default
-        configuration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
-        configuration.timeoutIntervalForRequest = 20.0
-        
-        let manager = Alamofire.SessionManager(configuration: configuration, serverTrustPolicyManager:ServerTrustPolicyManager.defaultManager)
-        manager.startRequestsImmediately = false
-        return manager
-    }
-    
 }
 
-func myBaseUrl(_ path: String) -> String {
-    if path.isCompleteUrl { return path }
-    return WebService.shared.rootUrl;
-}
-
-func myPath(_ path: String) -> String {
-    if path.isCompleteUrl { return "" }
-    return path;
-}
-
-extension String {
-    var isCompleteUrl: Bool {
-        let scheme = self.lowercased()
-        if scheme.contains("http") { return true }
-        return false
-    }
-}

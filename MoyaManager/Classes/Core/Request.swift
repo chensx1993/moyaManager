@@ -11,6 +11,32 @@ import Moya
 
 extension Network {
     @discardableResult
+    public static func getJson(_ url: String,
+                        parameters: [String : Any]? = nil,
+                        headers: [String : String]? = nil,
+                        callbackQueue: DispatchQueue? = DispatchQueue.main,
+                        progress: ProgressBlock? = .none,
+                        success: @escaping JsonSuccess,
+                        failure: @escaping Failure) -> Cancellable {
+        
+        let network = Networking<CommonAPI>()
+        return network.requestJson(.get(url, parameters: parameters, header: headers), callbackQueue: callbackQueue, progress: progress, success: success, failure: failure)
+    }
+    
+    @discardableResult
+    public static func postJson(_ url: String,
+                         parameters: [String : Any]? = nil,
+                         headers: [String : String]? = nil,
+                         callbackQueue: DispatchQueue? = DispatchQueue.main,
+                         progress: ProgressBlock? = .none,
+                         success: @escaping JsonSuccess,
+                         failure: @escaping Failure) -> Cancellable {
+        
+        let network = Networking<CommonAPI>()
+        return network.requestJson(.post(url, parameters: parameters, header: headers), callbackQueue: callbackQueue, progress: progress, success: success, failure: failure)
+    }
+    
+    @discardableResult
     public static func get(_ url: String,
                     parameters: [String : Any]? = nil,
                     headers: [String : String]? = nil,
@@ -94,5 +120,4 @@ extension CommonAPI: MyServerType {
         }
         return requeseParameters;
     }
-    
 }

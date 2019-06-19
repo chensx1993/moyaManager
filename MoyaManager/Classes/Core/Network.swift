@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 import Moya
 
 public typealias Success = (_ response: Moya.Response) -> Void
@@ -64,7 +65,7 @@ extension Networking {
 extension Networking {
     
     public static func newDefaultProvider() -> MoyaProvider<T> {
-        return newProvider(plugins)
+        return newProvider(plugins: plugins)
     }
     
     static func endpointsClosure<T>() -> (T) -> Endpoint where T: MyServerType {
@@ -119,12 +120,23 @@ extension Networking {
     
 }
 
-func newProvider<T>(_ plugins: [PluginType] ) -> MoyaProvider<T> where T: MyServerType {
+func newProvider<T>(plugins: [PluginType], manager: Manager = newManager()) -> MoyaProvider<T> where T: MyServerType {
     return MoyaProvider(endpointClosure: Networking<T>.endpointsClosure(),
                         requestClosure: Networking<T>.endpointResolver(),
                         stubClosure: Networking<T>.APIKeysBasedStubBehaviour,
-                        manager: WebService.shared.manager,
+                        manager: manager,
                         plugins: plugins)
+}
+
+
+func newManager(delegate: SessionDelegate = SessionDelegate(),
+                serverTrustPolicyManager: ServerTrustPolicyManager? = nil) -> Manager {
+    let configuration = URLSessionConfiguration.default
+    configuration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
+    
+    let manager = Alamofire.SessionManager(configuration: configuration, delegate:delegate, serverTrustPolicyManager:serverTrustPolicyManager)
+    manager.startRequestsImmediately = false
+    return manager
 }
 
 //protocol NetworkingType {
